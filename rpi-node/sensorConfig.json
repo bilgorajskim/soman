@@ -1,0 +1,9 @@
+[
+  {
+    "id": "fd0fed81-a44f-4548-a275-5ebfa53e77a7",
+    "serialId": "S",
+    "type": "analog",
+    "low": 0,
+    "high": 100
+  }
+]

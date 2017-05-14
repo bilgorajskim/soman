@@ -1,0 +1,21 @@
+{
+  "env": {
+    "test": {
+      "presets": [
+        [
+          "env",
+          {
+            "targets": {
+              "browsers": ["> 10%"]
+            }
+          }
+        ]
+      ]
+    }
+  },
+  "presets": [
+    ["es2015", {
+      "modules": false
+    }], "stage-0", "react"
+  ]
+}

@@ -1,0 +1,17 @@
+### OSX ###
+.DS_Store
+.AppleDouble
+.LSOverride
+
+npm-debug.log*
+
+# npm
+node_modules/
+
+# Compass
+.sass-cache
+
+# virtual environments
+.env
+
+.idea/

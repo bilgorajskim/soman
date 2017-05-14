@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% load render_bundle from webpack_loader %}
+{% block title %}Notatki{% endblock %}
+{% block nav %}{% endblock %}
+{% block content %}
+<div id="app"></div>
+    <form id="logout-form" action="/accounts/logout/" method="POST" style="display:none">
+        {% csrf_token %}
+    </form>
+    <script>
+    window.user = {% if user %}true{% else %}false{% endif %};
+    </script>
+{% endblock content %}
+
+{% block css %}
+{{ block.super }}
+{% render_bundle 'panel' 'css' %}
+{% endblock css %}
+
+{% block javascript %}
+{{ block.super }}
+{% render_bundle 'panel' 'js' %}
+{% endblock javascript %}

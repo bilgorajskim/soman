@@ -1,0 +1,33 @@
+# Basics
+*.py[cod]
+__pycache__
+
+# Logs
+logs
+*.log
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+htmlcov
+
+# Translations
+*.mo
+*.pot
+
+# Compass
+.sass-cache
+
+# virtual environments
+.env
+
+# User-uploaded media
+soman/media/
+soman/static/webpack_bundles
+
+# Auth data (admin account, Google tokens) fixture
+/soman/sensors/fixtures/auth.json
+
+webpack-stats.json
