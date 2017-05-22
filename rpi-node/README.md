@@ -4,7 +4,8 @@ Passes data from Arduino to the Django server.
 
 ## Usage
 
-First, edit sensorConfig.json. Use sensor IDs from Django admin panel and map them to Arduino signals.
+Rename sensorConfig.json.example to sensorConfig.json and edit it to suit your needs. 
+Use sensor UUIDs from Django admin panel.
 
 Then run it using this command:
 
