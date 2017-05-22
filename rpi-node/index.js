@@ -4,27 +4,31 @@ const _ = require('lodash');
 const COMMUNICATION_BACKEND = process.env.COMMUNICATION_BACKEND || 'http';
 const TEST = process.env.TEST == true || false;
 const TEST_SIGNAL_INTERVAL = process.env.TEST_SIGNAL_INTERVAL || 1000;
-const THROTTLE_INTERVAL = process.env.THROTTLE_INTERVAL || 10;
+const THROTTLE_INTERVAL = process.env.THROTTLE_INTERVAL || 100;
 
 const pushUpdate = require('./communicationBackends/' +
   COMMUNICATION_BACKEND
   + '.js')
 .pushSensorUpdate;
 
-let lastValue = null;
-const pushThrottledUpdate = _.throttle(function (options) {
-  if (lastValue === options.value)
-    return;
-  lastValue = options.value;
-  pushUpdate(options);
-}, THROTTLE_INTERVAL);
+let pushTimeouts = {}
+
+const pushThrottledUpdate = function (options) {
+  sensorStates[options.sensorId] = {
+    value: options.value,
+    date: Date.now()
+  }
+  if (pushTimeouts[options.sensorId]) {
+    clearTimeout(pushTimeouts[options.sensorId])
+  }
+  pushTimeouts[options.sensorId] = setTimeout(() => {
+    pushUpdate(options)
+  }, 1000)
+};
 
 const sensors = require('./sensorConfig.json');
-
-let sensorGpios = [];
-var ports = [];
-var SerialPort = require('serialport', {lock: false});
-
+let sensorStates = {};
+const SerialPort = require('serialport', {lock: false});
 if (TEST) {
   console.log(`Simulating 0-1 values with ${TEST_SIGNAL_INTERVAL}ms interval`);
   sensors.forEach(sensor => {
@@ -42,24 +46,27 @@ if (TEST) {
     }, TEST_SIGNAL_INTERVAL);
   });
 } else {
-    var port = new SerialPort('/dev/ttyAMA0');
-    var Delimiter = SerialPort.parsers.Delimiter;
-    SerialPort.list((err, ports) => {
-      console.log(ports);
+    const port = new SerialPort('/dev/ttyACM0', {
+      baudRate: 9600
     });
-    var parser = port.pipe(new ByteLength({length: 8}));
-    //let parser = port.pipe(new Delimiter({delimiter: ';'}));
+    const DelimiterParser = SerialPort.parsers.Delimiter;
+    const parser = port.pipe(new DelimiterParser({delimiter: ';'}));
     parser.on('data', function (data) {
-        console.log('Data', data, JSON.stringify(data));
-      // let sensorType = data.charAt(0);
-      // let sensorState = data.charAt(1);
-      // console.log(sensorType, sensorState);
+      let arduinoSensorId = String.fromCharCode(data[0])
+      let arduinoSensorValue = parseInt(`${data}`.substring(1))
+      let sensorConfig = sensors.find(s => s.serialId === arduinoSensorId)
+      if (!sensorConfig)
+        return
+      let serverSensorId = sensorConfig.id
+      if (sensorStates[serverSensorId] && arduinoSensorValue === sensorStates[serverSensorId].value)
+        return
+      console.log('Sensor update:', arduinoSensorId,
+        arduinoSensorValue, '(' + String.fromCharCode(data[1]) + ')')
+      if (isNaN(arduinoSensorValue)) {
+        return console.warn('Ignoring invalid value:', arduinoSensorValue)
+      }
+      pushThrottledUpdate({value: arduinoSensorValue, sensorId: serverSensorId})
     });
-
-  port.on('error', function(err) {
-    console.log('Error: ', err.message);
-  });
-  ports.push(port);
 }
 
 console.log('Pushing data via ' + COMMUNICATION_BACKEND);

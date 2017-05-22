@@ -30,7 +30,7 @@ module.exports = {
       paths.entries + '/main.js',
       paths.entries + '/main.scss'
     ],
-    notes: [
+    panel: [
       'babel-polyfill',
       paths.entries + '/app/app.js'
     ]

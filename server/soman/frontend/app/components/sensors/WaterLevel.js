@@ -1,7 +1,8 @@
 import React from 'react';
 import SensorIcon from 'react-icons/lib/fa/life-bouy';
 
-export default function waterSensor({data, color, active}) {
+export default function waterSensor({data, color}) {
+  const active = data ? data.waterDetected : false
   return <div className={active?'sensor--active':''}>
     <div className="sensor__icon">
     <SensorIcon />

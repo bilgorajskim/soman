@@ -3,8 +3,6 @@ import {connect} from "react-redux";
 import { Row, Col, Card, CardTitle, CardBlock, Button, Form, FormGroup, Label, Input, ButtonGroup} from 'reactstrap';
 import React3 from 'react-three-renderer';
 import * as THREE from 'three';
-import ParsedModel from './../../parsedModel/parsed_model.js';
-import createMaterial from './../../parsedModel/create_material.js';
 import OrbitControls from './../../OrbitControls';
 
 class ThreeLevelView extends PureComponent {

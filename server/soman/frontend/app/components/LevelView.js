@@ -72,7 +72,10 @@ class LevelView extends PureComponent {
           if (event) {
             return {
               ...sensor,
-              event
+              data: {
+                ...sensor.date,
+                ...event.data
+              }
             }
           }
           return sensor;
@@ -128,7 +131,7 @@ class LevelView extends PureComponent {
           let sensorElements = zone.sensors.map((sensor, i) => {
             let renderedSensor = null;
             switch (sensor.type) {
-              case 'water_level':
+              case 'water':
                 renderedSensor = require('./sensors/WaterLevel.js').default;
                 break;
               case 'motion':

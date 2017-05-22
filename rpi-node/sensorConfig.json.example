@@ -1,0 +1,14 @@
+[
+  {
+    "id": "<UUID-FROM-DJANGO>",
+    "serialId": "S",
+    "type": "analog",
+    "low": 0,
+    "high": 100
+  },
+  {
+    "id": "<UUID-FROM-DJANGO>",
+    "serialId": "W",
+    "type": "digital"
+  }
+]

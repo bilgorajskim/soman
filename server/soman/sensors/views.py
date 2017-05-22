@@ -5,7 +5,7 @@ from django.utils import timezone
 from .serializers.sensor import SensorSerializer
 from .serializers.zone import ZoneSerializer
 from .models import Zone, Level, Sensor, SensorEvent
-from rest_framework import routers, serializers, viewsets, generics
+from rest_framework import routers, serializers, viewsets, generics, filters
 from rest_framework.pagination import PageNumberPagination
 import django_filters.rest_framework
 import datetime
@@ -61,6 +61,8 @@ class SensorEventViewSet(viewsets.ModelViewSet):
     queryset = SensorEvent.objects.all()
     serializer_class = SensorEventSerializer
     pagination_class = SensorSetPagination
+    filter_backends = (filters.OrderingFilter,)
+    ordering_fields = ('date',)
 
 @csrf_exempt
 def push_sensor_view(request):

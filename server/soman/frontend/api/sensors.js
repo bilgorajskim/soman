@@ -3,7 +3,7 @@ import axios from 'axios';
 const ENDPOINT = '/sensors/api/';
 
 export async function getLatestEvents() {
-    const resp = await axios.get('/sensors/api/sensor-events/?page_size=10')
+    const resp = await axios.get('/sensors/api/sensor-events/?page_size=10&ordering=-date')
     return resp.data.results
 }
 
