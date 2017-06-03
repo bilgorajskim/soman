@@ -26,6 +26,8 @@ htmlcov
 # User-uploaded media
 soman/media/
 soman/static/webpack_bundles
+soman/frontend/img/feats
+soman/frontend/app/featConfig.js
 
 # Auth data (admin account, Google tokens) fixture
 /soman/sensors/fixtures/auth.json

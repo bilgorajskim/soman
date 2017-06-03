@@ -2,13 +2,13 @@ import React from 'react';
 import SensorIcon from 'react-icons/lib/fa/life-bouy';
 
 export default function waterSensor({data, color}) {
-  const active = data ? data.waterDetected : false
+  const active = data ? data.value > 25 : false
   return <div className={active?'sensor--active':''}>
     <div className="sensor__icon">
-    <SensorIcon />
+      <SensorIcon />
     </div>
-      <div className="sensor__label">
-        {active?'Wykryto wodę!':'Brak wody'}
-      </div>
+    <div className="sensor__label">
+      {active?'Wykryto wodę!':'Brak wody'}
+    </div>
   </div>;
 }

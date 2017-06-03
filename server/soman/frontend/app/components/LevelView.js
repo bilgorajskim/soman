@@ -2,10 +2,12 @@ import React, {PureComponent} from 'react';
 import {connect} from "react-redux";
 import {Row, Col, Card, CardTitle, CardBlock, Button, Form, FormGroup, Label, Input, ButtonGroup} from 'reactstrap';
 import tinycolor from 'tinycolor2';
-import {pusher} from './../pusher.js';
 import API from './../../api/index.js';
 import SensorList from './SensorList.js';
 import ThreeLevelView from './ThreeLevelView.js';
+import EventHistory from './sensors/EventHistory'
+import { closeEventHistory, showEventHistory } from '../state/modules/eventHistory'
+import CircularProgress from 'material-ui/CircularProgress';
 
 const renderField = ({input, label, type, labelWidth, inputWidth, children}) => {
   if (!labelWidth) labelWidth = 4;
@@ -41,11 +43,13 @@ class LevelView extends PureComponent {
       toggles: {
         sensors: true,
         blueprint: true,
-        zones: true
+        zones: true,
+        use3d: false
       },
       zones: [],
       sensors: [],
-      level: null
+      level: null,
+      loaded: false
     };
   }
 
@@ -59,63 +63,70 @@ class LevelView extends PureComponent {
   }
 
   componentDidMount() {
-    setInterval(async () => {
-      let latestEvents = await API.sensors.getLatestEvents()
-      latestEvents.sort(function(a,b){
-        // Turn your strings into dates, and then subtract them
-        // to get a value that is either negative, positive, or zero.
-        return new Date(b.date) - new Date(a.date);
-      });
-      let newZones = this.state.zones.map(zone => {
-        let sensors = zone.sensors.map(sensor => {
-          let event = latestEvents.find(event => event.sensor_id === sensor.id);
-          if (event) {
-            return {
-              ...sensor,
-              data: {
-                ...sensor.date,
-                ...event.data
-              }
-            }
-          }
-          return sensor;
-        });
-        return {
-          ...zone,
-          sensors
-        };
-      });
-      this.setState({
-        ...this.state,
-        zones: newZones
-      });
-    }, 3000);
-    window.logState = () => {
-      console.log(this.state);
-    };
     this._loadDataForLevel(this.props.level);
   }
 
-  _loadDataForLevel(level) {
-    API.zones.getZones({level: level.id}).then((zones) => {
-      this.setState({
-        zones
-      })
+  _updateSensor(sensorId, event) {
+    let newZones = this.state.zones.map(zone => {
+      let sensors = zone.sensors.map(sensor => {
+        if (sensor.id === sensorId) {
+          return {
+            ...sensor,
+            data: event.data,
+            updated: true
+          }
+        }
+        return sensor;
+      });
+      return {
+        ...zone,
+        sensors
+      };
+    });
+    this.setState({
+      ...this.state,
+      zones: newZones
     });
   }
 
+  async _loadDataForLevel(level) {
+    API.zones.getZones({level: level.id}).then((zones) => {
+      this.setState({
+        zones
+      });
+      this.state.zones.forEach(zone => {
+        zone.sensors.forEach(sensor => {
+          let loadSensor = async () => {
+            let events = await API.sensors.getLatestEventsForSensor(sensor.id)
+            if (events.length) {
+              let latestEvent = events[0]
+              this._updateSensor(sensor.id, latestEvent)
+            }
+            this.setState({
+              loaded: true
+            })
+          }
+          setInterval(() => loadSensor(), 3000)
+          loadSensor()
+        })
+      })
+    })
+  }
+
   componentWillReceiveProps(nextProps) {
-    console.log('next props', nextProps);
     this._loadDataForLevel(nextProps.level);
   }
 
   render() {
     let toggles = this.state.toggles;
     let currentLevel = this.props.level;
-    let use3d = this.props.use3d;
+    let use3d = toggles.use3d;
 
     let zones = this.state.zones;
     let sensorList = <SensorList
+      onSensorClick={sensor => {
+        this.props.showEventHistory(sensor.id)
+      }}
       zones={this.state.zones} level={this.props.level}/>;
     let blueprint = null;
 
@@ -132,16 +143,22 @@ class LevelView extends PureComponent {
             let renderedSensor = null;
             switch (sensor.type) {
               case 'water':
-                renderedSensor = require('./sensors/WaterLevel.js').default;
+                renderedSensor = require('./sensors/Water.js').default;
                 break;
               case 'motion':
                 renderedSensor = require('./sensors/Motion.js').default;
                 break;
-              case 'light':
-                renderedSensor = require('./sensors/Light.js').default;
-                break;
               case 'smoke':
                 renderedSensor = require('./sensors/Smoke.js').default;
+                break;
+              case 'door':
+                renderedSensor = require('./sensors/Door.js').default;
+                break;
+              case 'temperature':
+                renderedSensor = require('./sensors/Temperature.js').default;
+                break;
+              case 'humidity':
+                renderedSensor = require('./sensors/Humidity.js').default;
                 break;
               default:
                 throw new Error('Unsupported sensor type: ' + sensor.type);
@@ -182,14 +199,22 @@ class LevelView extends PureComponent {
       }
     }
 
-    return <div>
+    if (!this.state.loaded) {
+      return <div style={{margin: '3em 0', textAlign: 'center'}}>
+        <CircularProgress size={150} thickness={10} />
+      </div>;
+    }
+
+    return <div style={{position: 'relative'}}>
+      {this.props.historyActive ?
+        <EventHistory events={this.props.events} onClose={this.props.closeEventHistory} />
+        : null}
       <Row>
         <Col md={12} lg={3}>
-          <CardTitle>Czujniki</CardTitle>
           {sensorList}
         </Col>
         <Col md={12} lg={9}>
-          <div className="blueprint-controls">
+          <div className="blueprint-controls" style={{marginTop: '1em'}}>
             <Form inline>
               {renderField({
                 type: 'checkbox',
@@ -206,6 +231,11 @@ class LevelView extends PureComponent {
                 label: 'sensory',
                 input: {checked: toggles.sensors, onChange: e => this._toggleLayer('sensors', e.target.checked)}
               })}
+              {renderField({
+                type: 'checkbox',
+                label: 'widok 3D',
+                input: {checked: toggles.use3d, onChange: e => this._toggleLayer('use3d', e.target.checked)}
+              })}
             </Form>
           </div>
           {blueprint}
@@ -216,12 +246,16 @@ class LevelView extends PureComponent {
 }
 
 const mapStateToProps = (state) => {
-  return {}
+  return {
+    historyActive: state.eventHistory.modalActive,
+    historyEvents: state.eventHistory.events
+  }
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return {}
-};
+  return {
+    showEventHistory, closeEventHistory
+  }};
 
 export default connect(
   mapStateToProps,

@@ -63,7 +63,8 @@ LOCAL_APPS = [
     'soman.users.apps.UsersConfig',
     'soman.panel.apps.NotesConfig',
     'soman.sensors.apps.SensorsConfig',
-    'soman.menu.apps.MenuConfig'
+    'soman.menu.apps.MenuConfig',
+    'soman.announcements.apps.AnnouncementsConfig'
     # Your stuff: custom apps go here
 ]
 

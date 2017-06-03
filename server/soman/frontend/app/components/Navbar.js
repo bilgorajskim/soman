@@ -23,24 +23,24 @@ class Navbar extends PureComponent {
     let {auth} = this.props;
     return (
       <div>
-        <nav className="navbar navbar-toggleable-md navbar-light bg-faded client-area__navbar">
+        <nav className="navbar navbar-toggleable-md navbar-light client-area__navbar">
           <Container>
             <NavbarToggler onClick={this.toggleNavbar}/>
             <NavbarBrand href="/" className="ml-2">
-              <img src="/static/images/favicon.ico" alt=""/>
+              SOMAN
             </NavbarBrand>
             <Collapse className="navbar-collapse" isOpen={!this.state.collapsed}>
               <ul className="navbar-nav mr-auto">
-                <NavLink exact to={`/dashboard`} className="nav-link" activeClassName="active">
+                <NavLink to={`/dashboard`} className="nav-link">
                   Przegląd
                 </NavLink>
-                <NavLink exact to={`/menu`} className="nav-link" activeClassName="active">
+                <NavLink to={`/menu`} className="nav-link">
                   Jadłospis
                 </NavLink>
-                <NavLink exact to={`/notes`} className="nav-link" activeClassName="active">
+                <NavLink to={`/notes`} className="nav-link">
                   Ogłoszenia
                 </NavLink>
-                <NavLink to={`/sensors`} className="nav-link" activeClassName="active">
+                <NavLink to={`/sensors`} className="nav-link">
                   Czujniki
                 </NavLink>
               </ul>

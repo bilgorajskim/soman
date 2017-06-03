@@ -1,46 +1,24 @@
 import React, {PureComponent} from 'react';
 import {connect} from "react-redux";
-import {Row, Col, Button} from 'reactstrap';
-import Grid from './notes/Grid.js';
-import {loadNotes as loadNotes2} from './../state/modules/notes.js';
+import {loadNotes} from './../state/modules/notes.js';
+import API from './../../api/index.js';
+import Note from './notes/Note'
 
 class Notes extends PureComponent {
   render() {
     let {notes} = this.props;
 
-    let gridOptions = {
-      items: notes
-    };
-
     return <div>
       <h1>Ogłoszenia</h1>
-      <Button color="primary">
-        Dodaj ogłoszenie
-      </Button>
-      <Grid className="notes-app__notes"
-                 {...gridOptions}>
-      </Grid>
+      <div className="notes-app__notes">
+        {notes.map(n => <Note note={n} key={n.id} />)}
+      </div>
     </div>;
   }
 
-  componentDidMount() {
-    this.props.loadNotes([
-      {
-        id: 1,
-        text: 'testowa notatka',
-        color: 'white'
-      },
-      {
-        id: 2,
-        text: 'testowa notatka',
-        color: 'orange'
-      },
-      {
-        id: 13,
-        text: 'testowa notatka',
-        color: 'cyan'
-      }
-    ]);
+  async componentDidMount() {
+    const notes = await API.announcements.getAnnouncements()
+    this.props.loadNotes(notes);
   }
 }
 
@@ -52,7 +30,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    loadNotes: (notes) => dispatch(loadNotes2(notes))
+    loadNotes: (notes) => dispatch(loadNotes(notes))
   }
 };
 

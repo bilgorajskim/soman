@@ -13,28 +13,31 @@ import Notes from "./Notes.js";
 import Sensors from "./Sensors.js";
 import Dashboard from "./views/Dashboard.js";
 import Menu from "./views/Menu.js";
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import Footer from './Footer'
 
 class NotesApp extends PureComponent {
   render() {
     let {notification} = this.props;
-    return <Router basename="/panel/">
-      <div className="client-area">
-        <Navbar/>
-        {notification.message ? <Alert color={notification.type} style={{marginTop: '0.75rem'}}>
+    return <MuiThemeProvider>
+      <Router basename="/panel/">
+        <div>
+          <Navbar/>
+          {notification.message ? <Alert color={notification.type} style={{marginTop: '0.75rem'}}>
             {notification.message}
           </Alert> : null}
-        <div>
           <Route exact path="/" component={() => {
               return <Redirect to="/dashboard" />;
           }
           }/>
-          <Route exact path="/dashboard" component={Dashboard}/>
-          <Route exact path="/menu" component={Menu}/>
-          <Route exact path="/notes" component={Notes}/>
-          <Route exact path="/sensors" component={Sensors}/>
+          <Route path="/dashboard" component={Dashboard}/>
+          <Route path="/menu" component={Menu}/>
+          <Route path="/notes" component={Notes}/>
+          <Route path="/sensors" component={Sensors}/>
+          <Footer />
         </div>
-      </div>
-    </Router>;
+      </Router>
+    </MuiThemeProvider>
   }
 }
 

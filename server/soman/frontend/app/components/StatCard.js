@@ -1,18 +1,52 @@
 import React, {PureComponent} from 'react';
-import {Button} from 'reactstrap';
-import EditIcon from 'react-icons/lib/fa/edit';
 import tinycolor from 'tinycolor2';
+import API from './../../api/index.js';
+import Paper from 'material-ui/Paper';
+
+const style = {
+};
 
 class StatCard extends PureComponent {
 
-  componentWillMount() {
+  constructor(props) {
+    super(props)
+    this.state = {
+      latestEvent: null,
+      sensorId: null
+    }
+  }
+
+  componentDidMount() {
+    this._startFetchingData()
+  }
+
+  async _startFetchingData() {
+    let sensors = await API.sensors.getSensors()
+    let sensor = sensors.filter(s => s.type === this.props.sensor)[0]
+    if (!sensor) return
+    console.log('Found matching sensor for stat', this.props.sensor, sensor)
     this.setState({
-    });
+      sensorId: sensor.id
+    })
+    setInterval(() => this._update(), 10000)
+    this._update()
+  }
+
+  async _update() {
+    let events = await API.sensors.getLatestEventsForSensor(
+      this.state.sensorId
+    )
+    if (events.length) {
+      let latestEvent = events[0]
+      this.setState({
+        latestEvent
+      })
+    }
   }
 
   render() {
-    let {value, sensor} = this.props;
-
+    let {sensor} = this.props;
+    let value = this.state.latestEvent ? this.state.latestEvent.data.value : '?'
     let icon = null;
     let friendlyName = '';
     let friendlyValue = value;
@@ -30,11 +64,12 @@ class StatCard extends PureComponent {
         color = '#B8F4B8';
         friendlyValue = `${value}%`;
         break;
-      case 'airPollution':
-        friendlyName = 'powietrze';
-        icon = <img src={require('./../icons/airPollution.png')} alt='' />;
+      case 'smoke':
+        friendlyName = 'dym';
+        icon = <img src={require('./../icons/airPollution2.png')} alt='' />;
         color = '#FFC0C0';
-        friendlyValue = `${value}%`;
+        let pollutionLevel = Math.round((value/1000) * 100)
+        friendlyValue = `${pollutionLevel}%`
     }
 
     let bgColor = tinycolor(color);
@@ -43,7 +78,7 @@ class StatCard extends PureComponent {
       color: bgColor.isDark() ? '#fff' : '#000'
     };
 
-    return <div className="basic-stat" style={noteStyles}>
+    return <Paper className="basic-stat" style={noteStyles} zDepth={1}>
       <div className="basic-stat__img">
       {icon}
       </div>
@@ -53,7 +88,7 @@ class StatCard extends PureComponent {
       <div className="basic-stat__value">
       {friendlyValue}
       </div>
-    </div>
+    </Paper>
   }
 }
 

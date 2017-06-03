@@ -49,7 +49,7 @@ module.exports = {
       },
       {
         test: /\.(png|jpg|gif)$/,
-        loader: 'url-loader?limit=30000&name=[name]-[hash].[ext]'
+        loader: 'url-loader?limit=9990000&name=[name]-[hash].[ext]'
       },
       {
         test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,

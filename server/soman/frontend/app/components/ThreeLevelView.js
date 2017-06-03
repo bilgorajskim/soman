@@ -67,8 +67,18 @@ class ThreeLevelView extends PureComponent {
       window.innerWidth / 2, window.innerHeight / 2,
       window.innerHeight / - 2, 1, 10000
     );
-    camera.position.x = 1000;
+    camera.position.x = -5180.600468983319;
+    camera.position.y = 3861.408560741611;
+    camera.position.z = -2995.9862505668293;
+    camera.setRotationFromQuaternion(new THREE.Quaternion(
+      0.14121425273875396,
+      0.8308954769984029,
+      0.2447933188688136,
+      -0.4793198091173122
+    ))
+    camera.zoom = 0.819091054949432;
     scene.add( this.mesh );
+    window.logCamera = () => console.log(camera);
 
     this.sprites = [];
     this.state.zones.forEach(zone => {

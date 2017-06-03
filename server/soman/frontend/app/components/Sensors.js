@@ -11,8 +11,7 @@ class Sensors extends PureComponent {
     super(props);
     this.state = {
       levels: [],
-      currentLevel: null,
-      use3d: false
+      currentLevel: null
     };
   }
 
@@ -43,7 +42,8 @@ class Sensors extends PureComponent {
     }
 
     return <div>
-      <ButtonGroup>
+      <div style={{textAlign: 'center'}}>
+        <ButtonGroup>
         {this.state.levels.map(level => (
           <Button key={level.id}
                   onClick={() => {
@@ -51,23 +51,8 @@ class Sensors extends PureComponent {
                   }}
                   color={this.state.currentLevel == level.id ? 'primary' : 'secondary'}>{level.name}</Button>
         ))}
-      </ButtonGroup>
-      <Form inline>
-        {
-          renderField({
-            type: 'checkbox',
-            label: 'widok 3D',
-            input: {
-              checked: this.state.use3d,
-              onChange: e => {
-                this.setState({
-                  use3d: e.target.checked
-                })
-              }
-            }
-          })
-        }
-      </Form>
+        </ButtonGroup>
+      </div>
       {levelView}
     </div>;
   }

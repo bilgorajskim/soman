@@ -63,6 +63,16 @@ class SensorEventViewSet(viewsets.ModelViewSet):
     pagination_class = SensorSetPagination
     filter_backends = (filters.OrderingFilter,)
     ordering_fields = ('date',)
+    def get_queryset(self):
+        """
+        Optionally restricts the returned purchases to a given user,
+        by filtering against a `username` query parameter in the URL.
+        """
+        queryset = SensorEvent.objects.all()
+        sensor_id = self.request.query_params.get('sensor_id', None)
+        if sensor_id is not None:
+            queryset = queryset.filter(sensor_id=sensor_id)
+        return queryset
 
 @csrf_exempt
 def push_sensor_view(request):
@@ -72,19 +82,12 @@ def push_sensor_view(request):
     sensor = Sensor.objects.get(id=body['sensorId'])
 
     rawvalue = body['value']
-    data = {}
-    if sensor.type == 'water':
-        data = {
-            'waterDetected': True if rawvalue == 1 else False
-        }
-    if sensor.type == 'smoke':
-        data = {
-            'pollution': rawvalue
-        }
     event = SensorEvent.objects.create(
         date=timezone.now(),
         sensor=sensor,
-        data=data
+        data={
+            'value': rawvalue
+        }
     )
     event.save()
     return JsonResponse('Saved sensor event', safe=False)

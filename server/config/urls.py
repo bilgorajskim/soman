@@ -20,6 +20,7 @@ urlpatterns = [
     url(r'^accounts/', include('allauth.urls')),
     url(r'^sensors/', include('soman.sensors.urls', namespace='sensors')),
     url(r'^menu/', include('soman.menu.urls', namespace='menu')),
+    url(r'^announcements/', include('soman.announcements.urls', namespace='announcements')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^panel/.*', include('soman.panel.urls')),
     url(r'^$', views.index, name='index')

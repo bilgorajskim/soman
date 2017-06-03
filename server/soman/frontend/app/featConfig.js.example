@@ -1,0 +1,4 @@
+export const featConfig = {
+	title: 'Example title',
+	subtitle: 'Example subtext..'
+}

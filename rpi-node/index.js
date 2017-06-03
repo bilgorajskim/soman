@@ -4,7 +4,7 @@ const _ = require('lodash');
 const COMMUNICATION_BACKEND = process.env.COMMUNICATION_BACKEND || 'http';
 const TEST = process.env.TEST == true || false;
 const TEST_SIGNAL_INTERVAL = process.env.TEST_SIGNAL_INTERVAL || 1000;
-const THROTTLE_INTERVAL = process.env.THROTTLE_INTERVAL || 100;
+const THROTTLE_INTERVAL = process.env.THROTTLE_INTERVAL || 250;
 
 const pushUpdate = require('./communicationBackends/' +
   COMMUNICATION_BACKEND
@@ -23,7 +23,7 @@ const pushThrottledUpdate = function (options) {
   }
   pushTimeouts[options.sensorId] = setTimeout(() => {
     pushUpdate(options)
-  }, 1000)
+  }, THROTTLE_INTERVAL)
 };
 
 const sensors = require('./sensorConfig.json');
@@ -52,16 +52,16 @@ if (TEST) {
     const DelimiterParser = SerialPort.parsers.Delimiter;
     const parser = port.pipe(new DelimiterParser({delimiter: ';'}));
     parser.on('data', function (data) {
-      let arduinoSensorId = String.fromCharCode(data[0])
-      let arduinoSensorValue = parseInt(`${data}`.substring(1))
+      let dataFragments = `${data}`.split(':')
+      let arduinoSensorId = dataFragments[0]
+      let arduinoSensorValue = parseInt(dataFragments[1])
       let sensorConfig = sensors.find(s => s.serialId === arduinoSensorId)
       if (!sensorConfig)
-        return
+        return console.error('Config not found for sensor:', arduinoSensorId)
       let serverSensorId = sensorConfig.id
       if (sensorStates[serverSensorId] && arduinoSensorValue === sensorStates[serverSensorId].value)
         return
-      console.log('Sensor update:', arduinoSensorId,
-        arduinoSensorValue, '(' + String.fromCharCode(data[1]) + ')')
+      console.log('Sensor update:', arduinoSensorId, arduinoSensorValue)
       if (isNaN(arduinoSensorValue)) {
         return console.warn('Ignoring invalid value:', arduinoSensorValue)
       }
