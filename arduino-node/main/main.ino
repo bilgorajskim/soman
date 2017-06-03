@@ -1,12 +1,15 @@
 #include <dht11.h>
- 
-dht11 DHT11;
 
 // Digital pins
 #define MOTIONPIN 3
 #define MAGNETPIN 4
 #define MAGNETPIN2 5
 #define AIRPIN 2
+
+// Analog pins
+#define SMOKEPIN 5
+#define LIQUIDPIN 2
+#define LIQUIDPIN2 3
 
 // Digital LEDs
 #define LED_LIQUIDPIN 13
@@ -16,33 +19,15 @@ dht11 DHT11;
 #define LED_MAGNETPIN 9
 #define LED_MAGNETPIN2 8
 
-// Analog pins
-#define SMOKEPIN 5
-#define LIQUIDPIN 2
-#define LIQUIDPIN2 3
- 
-// SENSOR DYMU
-int wartoscAnalog = 1;
-byte wartoscZmapowana = 0;        
-char info[96];
-
-// SENSOR WODY
-const int sensorPin= 0; //sensor poziomu wody na Analogu
-int liquid_level; //zmienna za poziom
-
-//SENSOR OTWARTYH DRZWI
-int state; //stan otwartych drzwi - czujnik magnetyczny
-int dym;
-
 void handleDHT11() {
-  int chk = DHT11.read(AIRPIN);         //sprawdzenie stanu sensora, a następnie wyświetlenie komunikatu na monitorze szeregowym
+  dht11 DHT11;
+  int chk = DHT11.read(AIRPIN);
   switch (chk)
   {
-    case DHTLIB_OK: 
-        //Serial.print("OK\t"); 
-        Serial.print("H:");              //wyświetlenie wartości wilgotności
+    case DHTLIB_OK:
+        Serial.print("H:");
         Serial.print((float)DHT11.humidity, 2);
-        Serial.print(";T:");           //wyświetlenie temperatury
+        Serial.print(";T:");
         Serial.print((float)DHT11.temperature, 2);
         Serial.print(";");
         break;
@@ -81,7 +66,7 @@ void setup() {
   pinMode(LED_MOTIONPIN, OUTPUT);
   pinMode(LED_MAGNETPIN, OUTPUT);
   pinMode(LED_MAGNETPIN2, OUTPUT);
-  Serial.begin(9600); //Otwieramy port szeregowy
+  Serial.begin(9600);
 }
 
 void handleLiquid1() {
@@ -147,6 +132,5 @@ void loop() {
   handleMagnet1();
   handleMagnet2();
   handleSmoke();
-  
-  delay(500);//Próbkuj co 1 sekundę
+  delay(500);
 }
