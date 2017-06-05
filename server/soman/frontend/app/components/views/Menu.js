@@ -39,7 +39,7 @@ class Menu extends PureComponent {
   componentDidMount () {
 
     let dates = []
-    for (let day = 1; day <= 14; day++) {
+    for (let day = 0; day <= 13; day++) {
       dates.push(moment().add(day, 'days').format('YYYY-MM-DD'))
     }
     console.log('will fetch menu for dates', dates)

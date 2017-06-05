@@ -18,5 +18,9 @@ Issues with the above approach:
 3. Really Unforgiving: No way to override this behavior
 4. Undocumented: No mention in the documentation, or it's too hard for me to find
 */
+const $ = require('jquery')
+window.jQuery = $
+window.$ = $
+
 require('./app/sass/bootstrap.scss')
 $('.form-group').removeClass('row');
