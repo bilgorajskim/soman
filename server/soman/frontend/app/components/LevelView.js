@@ -49,8 +49,13 @@ class LevelView extends PureComponent {
       zones: [],
       sensors: [],
       level: null,
-      loaded: false
+      loaded: false,
+      intervals: []
     };
+  }
+
+  componentWillUnmount() {
+    this.state.intervals.forEach(i => clearInterval(i))
   }
 
   _toggleLayer(layerName, active) {
@@ -106,7 +111,12 @@ class LevelView extends PureComponent {
               loaded: true
             })
           }
-          setInterval(() => loadSensor(), 3000)
+          this.setState({
+            intervals: [
+              ...this.state.intervals,
+              setInterval(() => loadSensor(), 3000)
+            ]
+          })
           loadSensor()
         })
       })

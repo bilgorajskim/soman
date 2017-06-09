@@ -1,5 +1,5 @@
 export const sensorConfig = {
 	smoke: {
-		triggerThreshold: 250
+		triggerThreshold: 350
 	}
 }

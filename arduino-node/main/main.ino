@@ -72,7 +72,7 @@ void setup() {
 void handleLiquid1() {
   int value = analogRead(LIQUIDPIN);
   Serial.print("W1:" + String(value) + ";");
-  if (value > 20) {
+  if (value > 25) {
     digitalWrite(LED_LIQUIDPIN, HIGH);
   }
   else {
@@ -83,7 +83,7 @@ void handleLiquid1() {
 void handleLiquid2() {
   int value = analogRead(LIQUIDPIN2);
   Serial.print("W2:" + String(value) + ";");
-  if (value > 20) {
+  if (value > 25) {
     digitalWrite(LED_LIQUIDPIN2, HIGH);
   }
   else {
@@ -116,7 +116,7 @@ void handleMagnet2() {
 void handleSmoke() {
   int value = analogRead(SMOKEPIN);
   Serial.print("S:" + String(value) + ";");
-  if (value > 250) {
+  if (value > 350) {
     digitalWrite(LED_SMOKEPIN, HIGH);
   }
   else {

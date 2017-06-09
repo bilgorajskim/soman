@@ -1,12 +1,14 @@
-var path = require('path');
-var webpack = require('webpack');
-var BundleTracker = require('webpack-bundle-tracker');
-var pjson = require('./package.json');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const path = require('path')
+const webpack = require('webpack')
+const BundleTracker = require('webpack-bundle-tracker')
+const pjson = require('./package.json')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+
+const CleanWebpackPlugin = require('clean-webpack-plugin')
 
 // Relative paths function
-var pathsConfig = function (appName) {
-  this.app = "./" + (appName || pjson.name);
+const pathsConfig = function (appName) {
+  this.app = './' + (appName || pjson.name)
 
   return {
     app: this.app,
@@ -19,9 +21,28 @@ var pathsConfig = function (appName) {
     js: this.app + '/static/js',
     bundles: this.app + '/static/webpack_bundles'
   }
-};
+}
 
-var paths = pathsConfig();
+const paths = pathsConfig()
+
+let plugins = [
+  new BundleTracker({filename: './webpack-stats.json'}),
+  new ExtractTextPlugin('[name]-[hash].css'),
+  new webpack.DefinePlugin({
+    'process.env.NODE_ENV': `"${process.env.NODE_ENV}"`
+  }),
+  new CleanWebpackPlugin([paths.bundles], {
+    root: __dirname,
+    verbose: true,
+    dry: false
+  })
+]
+
+if (process.env.NODE_ENV === 'production') {
+  plugins.push(
+    new webpack.optimize.UglifyJsPlugin()
+  )
+}
 
 module.exports = {
   context: __dirname,
@@ -53,43 +74,40 @@ module.exports = {
       },
       {
         test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
-        loader: "url-loader?limit=10000&mimetype=application/font-woff"
+        loader: 'url-loader?limit=10000&mimetype=application/font-woff'
       }, {
         test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
-        loader: "url-loader?limit=10000&mimetype=application/font-woff"
+        loader: 'url-loader?limit=10000&mimetype=application/font-woff'
       }, {
         test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-        loader: "url-loader?limit=10000&mimetype=application/octet-stream"
+        loader: 'url-loader?limit=10000&mimetype=application/octet-stream'
       }, {
         test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-        loader: "file-loader"
+        loader: 'file-loader'
       }, {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-        loader: "url-loader?limit=10000&mimetype=image/svg+xml"
+        loader: 'url-loader?limit=10000&mimetype=image/svg+xml'
       },
       {
         test: /\.css/i,
         loader: ExtractTextPlugin.extract({
-          fallback: "style-loader",
-          use: "css-loader"
+          fallback: 'style-loader',
+          use: 'css-loader'
         })
       },
       {
         test: /\.scss$/i,
         loader: ExtractTextPlugin.extract({
-          fallback: "style-loader",
-          use: ["css-loader", "sass-loader"]
+          fallback: 'style-loader',
+          use: ['css-loader', 'sass-loader']
         })
       }
     ]
   },
   output: {
     path: path.resolve(paths.bundles),
-    filename: "[name]-[hash].js"
+    filename: '[name]-[hash].js'
   },
 
-  plugins: [
-    new BundleTracker({filename: './webpack-stats.json'}),
-    new ExtractTextPlugin("[name]-[hash].css")
-  ]
-};
+  plugins
+}

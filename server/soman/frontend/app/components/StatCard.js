@@ -12,7 +12,8 @@ class StatCard extends PureComponent {
     super(props)
     this.state = {
       latestEvent: null,
-      sensorId: null
+      sensorId: null,
+      intervals: []
     }
   }
 
@@ -20,15 +21,21 @@ class StatCard extends PureComponent {
     this._startFetchingData()
   }
 
+  componentWillUnmount() {
+    this.state.intervals.forEach(i => clearInterval(i))
+  }
+
   async _startFetchingData() {
     let sensors = await API.sensors.getSensors()
     let sensor = sensors.filter(s => s.type === this.props.sensor)[0]
     if (!sensor) return
-    console.log('Found matching sensor for stat', this.props.sensor, sensor)
     this.setState({
-      sensorId: sensor.id
+      sensorId: sensor.id,
+      intervals: [
+        ...this.state.intervals,
+        setInterval(() => this._update(), 10000)
+      ]
     })
-    setInterval(() => this._update(), 10000)
     this._update()
   }
 
